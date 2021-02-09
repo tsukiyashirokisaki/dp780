@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos
+from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos,trace
 from seaborn import heatmap
 from matplotlib.colors import ListedColormap
 import os
@@ -50,19 +50,12 @@ def preprocess_unit_matrix():
     unit_matrix_inv=np.array(unit_matrix_inv)
     return unit_matrix,unit_matrix_inv
 def misorientation(M1,M2,unit_matrix_inv):
-    middle=np.matmul(M1,np.linalg.inv(M2))
-    angle=180
-    for ele in unit_matrix_inv:
-        D=np.matmul(middle,ele)
-        cal=(D[0,0]+D[1,1]+D[2,2]-1.)/2.
-        if cal>1.01 or cal<-1.01:
-            # print(cal)
-            continue
-            
-        cal=np.clip(cal,-1,1)
-        
-        angle=min(arccos(cal),angle)
-    return float(angle)/np.pi*float(180)
+    middle=matmul(M1,np.linalg.inv(M2))
+    cal=matmul(middle,unit_matrix_inv)
+    cosval=-1
+    for i in range(24):
+        cosval=max((trace(cal[:3,3*i:3*i+3])-1)/2,cosval)
+    return arccos(cosval)/pi*float(180)
 def mat2plot(mat):
     label_colours = np.random.randint(255,size=(100,3))
     img=np.array([label_colours[ c % 100 ] for c in mat.astype("int")]).astype("uint8")
@@ -145,3 +138,25 @@ def L2(a,b):
     return (a-b)**2
 def L1(a,b):
     return abs(a-b)
+def f(num):
+    return num+1
+def calmisorientation(orient,i,j,h,w,inv,t):
+    if i==0:
+        if j!=w-1:
+            if misorientation(orient[i,j],orient[i,j+1],inv)>t:
+                return [[i,j+1],[i,j]]
+    else:
+        if j==0:
+            if misorientation(orient[i,j],orient[i-1,j],inv)>t:
+                return [[i,j-1],[i,j]]
+        else:
+            n1=misorientation(orient[i,j],orient[i-1,j],inv)
+            n2=misorientation(orient[i,j],orient[i,j-1],inv)
+            ret=[]
+            if n1>t:
+                ret.append([i,j])
+                ret.append([i-1,j])
+            if n2>t:
+                ret.append([i,j])
+                ret.append([i,j-1])
+            return ret

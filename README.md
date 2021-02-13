@@ -15,7 +15,7 @@ kernel_average.ipynb and edge.ipynb are other methods in this step
 ```
 4. explainable AI
 ```
-pythno saliency.py
+python saliency.py
 ```
 
 

@@ -7,6 +7,7 @@ import sys
 import os
 import cv2
 import pandas as pd
+import torch
 class Exp:
     def __init__(self,bef,aft):
         self.data=[bef,aft]
@@ -101,3 +102,15 @@ class Cluster:
             id2clus[ele].removen(id2clus[ss].index)        
         self.neigh=self.neigh.union(id2clus[ss].neigh)
         del id2clus[ss]
+class Dataset(torch.utils.data.Dataset):
+    def __init__(self,bef,im,target):
+        self.bef=bef
+        self.im=im
+        self.target=target
+    def __getitem__(self,index):
+        X=self.bef[index]
+        Y=self.target[index]
+        im=self.im[index]
+        return torch.tensor(X,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),im
+    def __len__(self):
+        return len(self.bef)

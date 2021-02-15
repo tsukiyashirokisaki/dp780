@@ -1,11 +1,12 @@
+import os
+import cv2
+import random
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
 from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos,trace
 from seaborn import heatmap
 from matplotlib.colors import ListedColormap
-import os
-import cv2
 def OR(angle):
     a,b,c=angle
     a=a/180*pi
@@ -88,41 +89,11 @@ def neigh(i,j):
         ret.append([i+1,j])
         ret.append([i-1,j])
     return ret
-def calpoint(p1,h0,w0,img2):
-    h,w,_=img2.shape
-    min_l=2e9
-    t=50
-    for k in range(max(h0-t,0),min(h0+t,h)):
-        for l in range(max(w0-t,0),min(w0+t,w)):
-            loss=L2(p1,img2[k,l])
-            if loss<min_l:
-                min_l=loss
-                ind=[k,l]
-    return ind
+
 def imgshow(im):    
     plt.imshow(im[:,:,6:])
     plt.show()
-def match(func,befarr,aftarr,h0,w0):
-    h=befarr.shape[0]
-    w=befarr.shape[1]
-    min_val=1e9
-    t=150
-    for i in range(max(0,h0-t),min(h0+t,aftarr.shape[0]-befarr.shape[0])):        
-        for j in range(max(0,w0-t),min(w0+t,aftarr.shape[1]-befarr.shape[1])):
-            val=np.sum(func(aftarr[i:i+h,j:j+w],befarr))
-#             print(val)    
-            if val<min_val:
-                min_val=val
-                param=[i,j]
-    return param,min_val
-#     for i in range(aftarr.shape[0]-befarr.shape[0]):        
-#         for j in range(aftarr.shape[1]-befarr.shape[1]):
-#             val=np.sum(func(aftarr[i:i+h,j:j+w],befarr))
-# #             print(val)    
-#             if val<min_val:
-#                 min_val=val
-#                 param=[i,j]
-#     return param,min_val
+
 def ipfread(path):
     im=[0,0,0]
     for ele in os.listdir(path):
@@ -134,32 +105,7 @@ def ipfread(path):
             im[2]=cv2.imread(path+"/"+ele)
     im=np.concatenate(im,axis=2)
     return im
-def L2(a,b):
-    return (a-b)**2
-def L1(a,b):
-    return abs(a-b)
-def f(num):
-    return num+1
-def calmisorientation(orient,i,j,h,w,inv,t):
-    if i==0:
-        if j!=w-1:
-            if misorientation(orient[i,j],orient[i,j+1],inv)>t:
-                return [[i,j+1],[i,j]]
-    else:
-        if j==0:
-            if misorientation(orient[i,j],orient[i-1,j],inv)>t:
-                return [[i,j-1],[i,j]]
-        else:
-            n1=misorientation(orient[i,j],orient[i-1,j],inv)
-            n2=misorientation(orient[i,j],orient[i,j-1],inv)
-            ret=[]
-            if n1>t:
-                ret.append([i,j])
-                ret.append([i-1,j])
-            if n2>t:
-                ret.append([i,j])
-                ret.append([i,j-1])
-            return ret
+
 def find_neigh(coord,h,w):
     i,j=coord
     neigh=set()
@@ -172,3 +118,17 @@ def find_neigh(coord,h,w):
     if j!=0:
         neigh.add((i,j-1))
     return neigh
+
+def negsample(corner):
+    mat=np.zeros([500,500])
+    for (i,j) in corner:
+        for k in range(max(0,i-49),min(500,i+50)):
+            for l in range(max(0,j-49),min(500,j+50)):
+                mat[k,l]=1
+    cand = []
+    for i in range(451):
+        for j in range(451):
+            if not mat[i][j]:
+                cand.append([i,j])
+    return random.sample(cand,len(corner))
+

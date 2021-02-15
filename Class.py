@@ -1,42 +1,14 @@
-import numpy as np
-import numpy.ma as ma
-import matplotlib.pyplot as plt
-from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos
-from func import OR,heatplot,misorientation,mat2plot, match
 import sys
 import os
 import cv2
-import pandas as pd
+import random
 import torch
-class Exp:
-    def __init__(self,bef,aft):
-        self.data=[bef,aft]
-    def shift(self,arr):
-        return (arr-0.5)*2.
-    def shiftb(self,arr):
-        return arr/2.+0.5
-    def match(self,attr,func):
-        bef=self.data[0];aft=self.data[1]
-        befarr=self.shift(bef.get(attr))
-        aftarr=self.shift(aft.get(attr))
-        h=bef.h
-        w=bef.w
-        max_val=0
-        for i in range(aft.h-bef.h):        
-            for j in range(aft.w-bef.w):
-                val=np.sum(func(aftarr[i:i+h,j:j+w],befarr))
-                if val>max_val:
-                    max_val=val
-                    param=[i,j]
-        self.i=param[0]
-        self.j=param[1]
-    def getmatch(self,attr,aft=1):
-        return self.mod(self.data[aft].get(attr),aft)
-    def mod(self,arr,aft=1):
-        if aft!=1:
-            return arr
-        else:
-            return arr[self.i:self.i+self.data[0].h,self.j:self.j+self.data[0].w]
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos
+from func import OR,heatplot,misorientation,mat2plot
+import pandas as pd
+
 class Data:
     def __init__(self,path=0,crop=False):
         self.inv=np.load("unit_matrix_inv.npy")
@@ -84,7 +56,6 @@ class Cluster:
         self.neigh=set()
         self.num=1
         self.index=index
-        
     def add(self,h,w):
         self.pixels.add((h,w))
         self.num+=1
@@ -103,14 +74,14 @@ class Cluster:
         self.neigh=self.neigh.union(id2clus[ss].neigh)
         del id2clus[ss]
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self,bef,im,target):
+    def __init__(self,bef,target,source):
         self.bef=bef
-        self.im=im
+        self.source=source
         self.target=target
     def __getitem__(self,index):
         X=self.bef[index]
         Y=self.target[index]
-        im=self.im[index]
-        return torch.tensor(X,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),im
+        source=self.source[index]
+        return torch.tensor(X,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),source
     def __len__(self):
         return len(self.bef)

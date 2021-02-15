@@ -9,8 +9,7 @@ python classify.py
 ```
 3. ferrite and martensite segmentation (before MTS)
 ```
-bash orientation.sh (Mac/Linux)
-orientation.bat (Windows)
+edge.ipynb
 kernel_average.ipynb and edge.ipynb are other methods in this step
 ```
 4. explainable AI

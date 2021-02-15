@@ -160,3 +160,15 @@ def calmisorientation(orient,i,j,h,w,inv,t):
                 ret.append([i,j])
                 ret.append([i,j-1])
             return ret
+def find_neigh(coord,h,w):
+    i,j=coord
+    neigh=set()
+    if i!=h-1:
+        neigh.add((i+1,j))
+    if i!=0:
+        neigh.add((i-1,j))
+    if j!=w-1:
+        neigh.add((i,j+1))
+    if j!=0:
+        neigh.add((i,j-1))
+    return neigh

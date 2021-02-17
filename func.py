@@ -68,7 +68,7 @@ def classplot(mat,show=1):
 def ipfplot(im,xyz=2,show=1):    
     img=im[:,:,3*xyz:3*xyz+3]
     if show:
-        plt.imshow()
+        plt.imshow(img)
     return img
 
 def neigh(i,j):

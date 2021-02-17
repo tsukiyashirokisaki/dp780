@@ -11,7 +11,7 @@ import time
 import matplotlib.pyplot as plt
 from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos,arctan,trace
 from torch.utils.data import DataLoader
-from func import OR,heatplot,mat2plot,imgshow,ipfread,misorientation,find_neigh
+from func import OR,heatplot,ipfread,misorientation,find_neigh,classplot
 from Class import Data,Cluster,Dataset
 import torch.nn.functional as F
 import matplotlib.patches as patches
@@ -163,7 +163,7 @@ for id in ma_id:
         ma_map[i,j]=1
 
 torch.save([class_map,id2clus,ma_id],path+"cluster.pkl")
-cv2.imwrite(path+"class_map.png",mat2plot(class_map,show=0))
+cv2.imwrite(path+"class_map.png",classplot(class_map,show=0))
 cv2.imwrite(path+"ma_map.png",ma_map*255)
 
 

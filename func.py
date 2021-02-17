@@ -3,6 +3,7 @@ import cv2
 import random
 import numpy as np
 import numpy.ma as ma
+import torch
 import matplotlib.pyplot as plt
 from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos,trace
 from seaborn import heatmap
@@ -57,11 +58,19 @@ def misorientation(M1,M2,unit_matrix_inv):
     for i in range(24):
         cosval=max((trace(cal[:3,3*i:3*i+3])-1)/2,cosval)
     return arccos(cosval)/pi*float(180)
-def mat2plot(mat):
-    label_colours = np.random.randint(255,size=(100,3))
-    img=np.array([label_colours[ c % 100 ] for c in mat.astype("int")]).astype("uint8")
+def classplot(mat,show=1):
+    label_colours = np.random.randint(255,size=(1000,3))
+    img=np.array([label_colours[ c % 1000 ] for c in mat.astype("int")]).astype("uint8")
     plt.imshow(img)
-    plt.show()
+    if show:
+        plt.show()
+    return img
+def ipfplot(im,xyz=2,show=1):    
+    img=im[:,:,3*xyz:3*xyz+3]
+    if show:
+        plt.imshow()
+    return img
+
 def neigh(i,j):
     if i>=h or i<0 or j>=w or j<0:
         return None
@@ -90,9 +99,6 @@ def neigh(i,j):
         ret.append([i-1,j])
     return ret
 
-def imgshow(im):    
-    plt.imshow(im[:,:,6:])
-    plt.show()
 
 def ipfread(path):
     im=[0,0,0]

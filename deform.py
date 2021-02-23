@@ -8,8 +8,8 @@ import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
 from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos
-from func import OR,heatplot,misorientation,mat2plot, match,imgshow,calpoint,L2,L1,ipfread
-from Class import Exp,Data,Cluster
+from func import OR,heatplot,misorientation,ipfread
+from Class import Data,Cluster
 import sys
 import os
 import cv2
@@ -45,22 +45,14 @@ def create_data(data_list,h0,w0,h,w):
         Y=exp.getmatch("Phase",1)!=0
 #         print(len(X),len(Y))
     return X,Y,ind,ind_
-class Dataset(torch.utils.data.Dataset):
+class Dataset():
     def __init__(self,bef,aft,im,im_):
         self.bef=bef
         self.aft=aft
         self.im=im
         self.im_=im_
         
-    def __getitem__(self,index):
-        index=index%(len(self.bef))
-        X,Y,ind,ind_=create_data([self.bef[index],self.aft[index],self.im[index],self.im_[index]])
-        return torch.tensor(X,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),ind,ind_,index
-    def __len__(self):
-        return len(self.bef)*2048
 
-
-# In[2]:
 
 
 def create_dataset(root="data/train/"):
@@ -75,8 +67,6 @@ def create_dataset(root="data/train/"):
         im.append(ipfread(path)/255.);im_.append(ipfread(path_)/255.)
     return Dataset(bef,aft,im,im_)
 
-
-# In[6]:
 
 
 def prepare_location(option):

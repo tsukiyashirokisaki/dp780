@@ -17,10 +17,10 @@ def choose(sel,feature,num):
 for i in range(1,len(feature)+1):
 	choose([],feature,i)
 for i,ele in enumerate(ret):
-	file.write("python classify3.py %s &\n"%("_".join(ele)))
-	file.write("python classify5.py %s &\n"%("_".join(ele)))
-	if i%3==2:
-		file.write("wait\n")
+	file.write("python3 classify.py %s\n"%("_".join(ele)))	
+	# file.write("python3 classify.py %s &\n"%("_".join(ele)))
+	# if i%6==5:
+	# 	file.write("wait\n")
 
 file.close()
 

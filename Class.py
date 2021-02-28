@@ -86,9 +86,9 @@ class Dataset(torch.utils.data.Dataset):
         return torch.tensor(X,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),source
     def __len__(self):
         return len(self.bef)
-class CNN3(nn.Module):
-    def __init__(self):
-        super(CNN3, self).__init__()
+class CNN50a(nn.Module):
+    def __init__(self,in_channel):
+        super(CNN50a, self).__init__()
         self.batchnorm = nn.BatchNorm2d(in_channel)
         self.relu = nn.ReLU() # activation
         self.maxpool = nn.MaxPool2d(kernel_size=2) 
@@ -114,9 +114,9 @@ class CNN3(nn.Module):
         out = self.fc1(out)
         out = self.softmax(out)
         return out
-class CNN5(nn.Module):
-    def __init__(self):
-        super(CNN5, self).__init__()
+class CNN50b(nn.Module):
+    def __init__(self,in_channel):
+        super(CNN50b, self).__init__()
         self.batchnorm = nn.BatchNorm2d(in_channel)
         self.relu = nn.ReLU() # activation
         self.maxpool = nn.MaxPool2d(kernel_size=2) 
@@ -136,6 +136,61 @@ class CNN5(nn.Module):
         out = self.maxpool(out) #11
         out = self.cnn3(out) #9
         out = self.relu(out)
+        out = out.view(out.size(0), -1)
+        # Linear function (readout)
+        out = self.fc1(out)
+        out = self.softmax(out)
+        return out
+class CNN49a(nn.Module):
+    def __init__(self,in_channel):
+        super(CNN49a, self).__init__()
+        self.batchnorm = nn.BatchNorm2d(in_channel)
+        self.relu = nn.ReLU() # activation
+        self.maxpool = nn.MaxPool2d(kernel_size=2) 
+        self.cnn1 = nn.Conv2d(in_channels=in_channel, out_channels=12, kernel_size=2, stride=1, padding=0) 
+        self.cnn2 = nn.Conv2d(in_channels=12, out_channels=18, kernel_size=3, stride=1, padding=0) 
+        self.cnn3 = nn.Conv2d(in_channels=18, out_channels=24, kernel_size=3, stride=1, padding=0) 
+        self.fc1 = nn.Linear(24 * 9 * 9, 2) 
+        self.softmax = nn.Softmax(1)
+    def forward(self, x):
+        # Convolution 1 49
+        out = self.batchnorm(x)
+        out = self.cnn1(x) # 48
+        out = self.relu(out)
+        out = self.maxpool(out) #24
+        out = self.cnn2(out) #22
+        out = self.relu(out) 
+        out = self.maxpool(out) #11
+        out = self.cnn3(out) #9
+        out = self.relu(out)
+        out = out.view(out.size(0), -1)
+        # Linear function (readout)
+        out = self.fc1(out)
+        out = self.softmax(out)
+        return out
+class CNN49b(nn.Module):
+    def __init__(self,in_channel):
+        super(CNN49b, self).__init__()
+        self.batchnorm = nn.BatchNorm2d(in_channel)
+        self.relu = nn.ReLU() # activation
+        self.maxpool = nn.MaxPool2d(kernel_size=2) 
+        self.cnn1 = nn.Conv2d(in_channels=in_channel, out_channels=12, kernel_size=4, stride=1, padding=0) 
+        self.cnn2 = nn.Conv2d(in_channels=12, out_channels=18, kernel_size=4, stride=1, padding=0) 
+        self.cnn3 = nn.Conv2d(in_channels=18, out_channels=24, kernel_size=3, stride=1, padding=0) 
+        self.fc1 = nn.Linear(24 * 4 * 4, 2) 
+        self.softmax = nn.Softmax(1)
+    def forward(self, x):
+        # Convolution 1 49
+        out = self.batchnorm(x)
+        out = self.cnn1(x) # 46
+        out = self.relu(out)
+        out = self.maxpool(out) #23
+        out = self.cnn2(out) #20
+        out = self.relu(out) 
+        out = self.maxpool(out) #10
+        out = self.cnn3(out) #8
+        out = self.relu(out)
+        out = self.maxpool(out) #4
         out = out.view(out.size(0), -1)
         # Linear function (readout)
         out = self.fc1(out)

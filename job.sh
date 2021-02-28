@@ -1,3 +1,15 @@
+#!/bin/bash
+#SBATCH --job-name="ml"
+#SBATCH --partition=rtx2080ti
+#SBATCH --ntasks=2
+#SBATCH --gres=gpu:1
+#SBATCH --time=0-10:10
+#SBATCH --output=cout.txt
+#SBATCH --error=cerr.txt
+###SBATCH --test-only
+
+sbatch_pre.sh
+module load gcc/8.3.0 cuda/11.0 python/3.8.7-gnu-gpu
 python3 classify.py Phase
 python3 classify.py Bands
 python3 classify.py Error
@@ -125,3 +137,7 @@ python3 classify.py Orient_BC_BS_MAD_Bands_Phase
 python3 classify.py Orient_BC_BS_MAD_Error_Phase
 python3 classify.py Orient_BC_BS_MAD_Error_Bands
 python3 classify.py Orient_BC_BS_MAD_Error_Bands_Phase
+
+
+sbatch_post.sh
+

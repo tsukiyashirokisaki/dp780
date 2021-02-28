@@ -125,15 +125,15 @@ def find_neigh(coord,h,w):
         neigh.add((i,j-1))
     return neigh
 
-def negsample(corner):
-    mat=np.zeros([500,500])
+def negsample(corner,pic_size=500,sam_size=50):
+    mat=np.zeros([pic_size,pic_size])
     for (i,j) in corner:
-        for k in range(max(0,i-49),min(500,i+50)):
-            for l in range(max(0,j-49),min(500,j+50)):
+        for k in range(max(0,i-sam_size+1),min(pic_size,i+sam_size)):
+            for l in range(max(0,j-sam_size+1),min(pic_size,j+sam_size)):
                 mat[k,l]=1
     cand = []
-    for i in range(451):
-        for j in range(451):
+    for i in range(pic_size-sam_size+1):
+        for j in range(pic_size-sam_size+1):
             if not mat[i][j]:
                 cand.append([i,j])
     return random.sample(cand,len(corner))

@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
 
 import sys
 import os
@@ -25,12 +20,12 @@ feature=sys.argv[1].split("_")
 pic_size=500
 sam_size=49
 def create_dataset(root="data/train/",feature=["Orient","MAD"],pic_size=500,sam_size=50):
-    corner=torch.load("data/corner.pkl")
+    corner=torch.load("data/780_corner.pkl")
     bef=[]
     target=[]
     source=[]
     h=w=sam_size
-    for date in os.listdir(root):
+    for date in sorted(os.listdir(root)):
         path=root+date+"/before/"
         data=Data(path)
         data.data["Orient"]=data.data["Orient"].reshape(data.h,data.w,-1)
@@ -64,8 +59,6 @@ test=create_dataset("data/test/",feature=feature,pic_size=pic_size,sam_size=sam_
 train_loader= DataLoader(train, batch_size=64, shuffle=True,  num_workers=0, drop_last=True )
 test_loader= DataLoader(test, batch_size=64, shuffle=True,  num_workers=0,  drop_last=False )
 
-
-# In[10]:
 
 for modeltype in [CNN49a,CNN49b]:
     in_channel=train[0][0].shape[0]

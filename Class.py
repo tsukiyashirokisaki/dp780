@@ -58,8 +58,9 @@ class Cluster:
         self.num=1
         self.index=index
     def add(self,h,w):
-        self.pixels.add((h,w))
-        self.num+=1
+    	if (h,w) not in self.pixels:
+    		self.pixels.add((h,w))
+    		self.num+=1
     def addn(self,n):
         self.neigh.add(n)
     def removen(self,n):

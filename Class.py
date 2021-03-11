@@ -76,15 +76,17 @@ class Cluster:
         self.neigh=self.neigh.union(id2clus[ss].neigh)
         del id2clus[ss]
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self,bef,target,source):
+    def __init__(self,bef,props,target,source):
         self.bef=bef
+        self.props=props
         self.source=source
         self.target=target
     def __getitem__(self,index):
         X=self.bef[index]
+        P=self.props[index]
         Y=self.target[index]
         source=self.source[index]
-        return torch.tensor(X,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),source
+        return torch.tensor(X,dtype=torch.float32),torch.tensor(P,dtype=torch.float32),torch.tensor(Y,dtype=torch.long),source
     def __len__(self):
         return len(self.bef)
 class CNN50a(nn.Module):

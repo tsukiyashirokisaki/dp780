@@ -6,20 +6,13 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos
-from func import OR,heatplot,misorientation
+from func import OR,heatplot,misorientation,quaternion
 import pandas as pd
 import torch.nn as nn
 
 class Data:
     def __init__(self,path=0,crop=False):
         self.inv=np.load("unit_matrix_inv.npy")
-        if crop:
-            d0,h0,w0,h,w=crop
-            self.w,self.h=w,h
-            self.data=dict()
-            for ele in ["Orient","Phase","MAD","BC","BS","Bands","Error"]:
-                self.data[ele]=d0.data[ele][h0:h0+h,w0:w0+w]
-            return 
         for ele in os.listdir(path):
             if ".ctf" in ele:
                 fn=path+ele
@@ -35,16 +28,19 @@ class Data:
         txt=file.read().split("\n")
         w,h=int(txt[4].split("\t")[1]),int(txt[5].split("\t")[1])
         orient=np.zeros([h,w,3,3])
-        data=df[['Euler1', 'Euler2', 'Euler3']].values.reshape(h,w,3)
+        quat=np.zeros([h,w,4])
+        euler=df[['Euler1', 'Euler2', 'Euler3']].values.reshape(h,w,3)
         for i in range(h):
             for j in range(w):
-                orient[i,j]=OR(data[i,j,:3])
+                quat[i,j]=quaternion(euler[i,j,:3])
+                orient[i,j]=OR(euler[i,j,:3])
         self.w,self.h=w,h
         self.data=dict()
         self.data["Orient"]=orient
+        self.data["Quaternion"]=quat
         for ele in ["Phase","MAD","BC","BS","Bands","Error"]:
             self.data[ele]=self.set(df,ele)
-        self.data["Euler"]=data
+        self.data["Euler"]=euler
     def set(self,df,attr):
         return df[attr].values.reshape(self.h,self.w)
     def get(self,attr):
@@ -140,22 +136,22 @@ class CNN50b(nn.Module):
         out = self.cnn3(out) #9
         out = self.relu(out)
         out = out.view(out.size(0), -1)
-        # Linear function (readout)
         out = self.fc1(out)
         out = self.softmax(out)
         return out
-class CNN49a(nn.Module):
-    def __init__(self,in_channel):
-        super(CNN49a, self).__init__()
+
+class CNN49ag(nn.Module):
+    def __init__(self,in_channel,comp):
+        super(CNN49ag, self).__init__()
         self.batchnorm = nn.BatchNorm2d(in_channel)
         self.relu = nn.ReLU() # activation
         self.maxpool = nn.MaxPool2d(kernel_size=2) 
         self.cnn1 = nn.Conv2d(in_channels=in_channel, out_channels=12, kernel_size=2, stride=1, padding=0) 
         self.cnn2 = nn.Conv2d(in_channels=12, out_channels=18, kernel_size=3, stride=1, padding=0) 
         self.cnn3 = nn.Conv2d(in_channels=18, out_channels=24, kernel_size=3, stride=1, padding=0) 
-        self.fc1 = nn.Linear(24 * 9 * 9, 2) 
+        self.fc1 = nn.Linear(24 * 9 * 9+comp, 2) 
         self.softmax = nn.Softmax(1)
-    def forward(self, x):
+    def forward(self, x,p):
         # Convolution 1 49
         out = self.batchnorm(x)
         out = self.cnn1(x) # 48
@@ -167,22 +163,23 @@ class CNN49a(nn.Module):
         out = self.cnn3(out) #9
         out = self.relu(out)
         out = out.view(out.size(0), -1)
-        # Linear function (readout)
+        if len(p)>1:
+            out = torch.cat([out,p],1)
         out = self.fc1(out)
         out = self.softmax(out)
         return out
-class CNN49b(nn.Module):
-    def __init__(self,in_channel):
-        super(CNN49b, self).__init__()
+class CNN49bg(nn.Module):
+    def __init__(self,in_channel,comp):
+        super(CNN49bg, self).__init__()
         self.batchnorm = nn.BatchNorm2d(in_channel)
         self.relu = nn.ReLU() # activation
         self.maxpool = nn.MaxPool2d(kernel_size=2) 
         self.cnn1 = nn.Conv2d(in_channels=in_channel, out_channels=12, kernel_size=4, stride=1, padding=0) 
         self.cnn2 = nn.Conv2d(in_channels=12, out_channels=18, kernel_size=4, stride=1, padding=0) 
         self.cnn3 = nn.Conv2d(in_channels=18, out_channels=24, kernel_size=3, stride=1, padding=0) 
-        self.fc1 = nn.Linear(24 * 4 * 4, 2) 
+        self.fc1 = nn.Linear(24 * 4 * 4+comp, 2) 
         self.softmax = nn.Softmax(1)
-    def forward(self, x):
+    def forward(self, x,p):
         # Convolution 1 49
         out = self.batchnorm(x)
         out = self.cnn1(x) # 46
@@ -195,7 +192,8 @@ class CNN49b(nn.Module):
         out = self.relu(out)
         out = self.maxpool(out) #4
         out = out.view(out.size(0), -1)
-        # Linear function (readout)
+        if len(p)>1:
+            out = torch.cat([out,p],1)
         out = self.fc1(out)
         out = self.softmax(out)
         return out

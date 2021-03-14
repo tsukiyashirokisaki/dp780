@@ -4,6 +4,7 @@ import random
 import numpy as np
 import numpy.ma as ma
 import torch
+import pandas as pd
 import matplotlib.pyplot as plt
 from numpy import pi, matmul,sqrt,dot,array,zeros,cos,sin,pi,arccos,trace
 from seaborn import heatmap
@@ -138,3 +139,24 @@ def negsample(corner,pic_size=500,sam_size=50):
                 cand.append([i,j])
     return random.sample(cand,len(corner))
 
+def properties(header=[]):
+    df=pd.read_excel("data/properties.xlsx",sheet_name="summary")
+    names=df["Title"].values
+    data=df[header].values
+    dic=dict()
+    for i in range(data.shape[1]):
+        data[:,i]=(data[:,i]-np.mean(data[:,i]))/np.std(data[:,i])
+    for i,name in enumerate(names):
+        dic[str(name)]=data[i,:].tolist()
+    return dic
+def quaternion(angle):
+    a,b,c=angle
+    a=a/180*pi
+    b=b/180*pi
+    c=c/180*pi
+    # a-> 1st(z); b->second(x'); c->third(z'')
+    return np.array([cos(a/2)*cos(b/2)*cos(c/2)-sin(a/2)*cos(b/2)*sin(c/2),
+            sin(a/2)*sin(b/2)*sin(c/2)+cos(a/2)*sin(b/2)*cos(c/2),
+            -cos(a/2)*sin(b/2)*sin(c/2)+sin(a/2)*sin(b/2)*cos(c/2),
+            cos(a/2)*cos(b/2)*sin(c/2)+sin(a/2)*cos(b/2)*cos(c/2)
+           ])

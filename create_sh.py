@@ -1,5 +1,6 @@
 file=open("train.sh","w")
-feature=["Orient","BC","BS","MAD","Error","Bands","Phase"]
+# feature=["Orient","BC","BS","MAD","Error","Bands","Phase"]
+feature=["Phase","MAD","BC","BS","Bands","Error","Quaternion"]
 ret=[]
 def choose(sel,feature,num):
 	global ret
@@ -16,12 +17,11 @@ def choose(sel,feature,num):
 		return
 for i in range(1,len(feature)+1):
 	choose([],feature,i)
+temp=open("job_temp.sh","r")
+file.write(temp.read()+"\n")
 for i,ele in enumerate(ret):
-	file.write("python3 classify.py %s\n"%("_".join(ele)))	
-	# file.write("python3 classify.py %s &\n"%("_".join(ele)))
-	# if i%6==5:
-	# 	file.write("wait\n")
-
+	file.write("python3 train.py %s\n"%("_".join(ele)))	
+file.write("sbatch_post.sh")
 file.close()
 
 

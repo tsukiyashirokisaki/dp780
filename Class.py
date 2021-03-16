@@ -163,7 +163,7 @@ class CNN49ag(nn.Module):
         out = self.cnn3(out) #9
         out = self.relu(out)
         out = out.view(out.size(0), -1)
-        if len(p)>1:
+        if len(p)>=1:
             out = torch.cat([out,p],1)
         out = self.fc1(out)
         out = self.softmax(out)
@@ -192,7 +192,7 @@ class CNN49bg(nn.Module):
         out = self.relu(out)
         out = self.maxpool(out) #4
         out = out.view(out.size(0), -1)
-        if len(p)>1:
+        if len(p)>=1:
             out = torch.cat([out,p],1)
         out = self.fc1(out)
         out = self.softmax(out)

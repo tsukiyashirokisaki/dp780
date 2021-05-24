@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import sys
 import os
 import cv2
@@ -24,8 +18,7 @@ from multiprocessing import Process, Pool
 from sklearn.mixture import GaussianMixture
 
 
-# In[44]:
-path=sys.argv[1]
+path="data/"+sys.argv[1]
 data=Data(path)
 orient=data.data["Orient"]
 phase=data.data["Phase"]
@@ -57,9 +50,6 @@ for i in range(h-1):
 res2=np.matmul(type2,inv)
 res2=arccos((np.max(np.trace(res2.reshape([(h-1)*w,3,72]).reshape((h-1)*w,3,3,24,order="F"),axis1=1,axis2=2),axis=1)-1)/2)/pi*180
 edge_v=res2.reshape([h-1,w])
-
-
-# In[46]:
 
 
 vertex=set()
@@ -161,17 +151,6 @@ while len(ma_pixels)>0:
         id2clus[main].num+=id2clus[be_merge].num
         del id2clus[be_merge]
 
-# num=[]
-# for i in range(1,c):
-#     if i in id2clus:
-#         if id2clus[i].num!=1:
-#             num.append(id2clus[i].num)
-
-# X = np.array(num).reshape(-1,1)
-# gm = GaussianMixture(n_components=2, random_state=0,tol=1e-5).fit(X)
-# gs=np.mean(gm.means_)
-# print(gs)
-
 for id in list(id2clus.keys()):
     neigh=set()
     for (i,j) in id2clus[id].pixels:
@@ -210,7 +189,6 @@ for id in list(id2clus.keys()):
         del id2clus[id]
         if id in ma_id:
             ma_id.remove(id)
-
 
 ma_map=np.zeros([h,w])
 for id in ma_id:

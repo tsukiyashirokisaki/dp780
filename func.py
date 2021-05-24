@@ -66,11 +66,11 @@ def classplot(mat,show=1):
     if show:
         plt.show()
     return img
-def ipfplot(im,xyz=2,show=1):    
-    img=im[:,:,3*xyz:3*xyz+3]
-    if show:
-        plt.imshow(img)
-    return img
+def ipfplot(im,xyz=2,show=1):
+	img=im[:,:,3*xyz:3*xyz+3]
+	if show:
+		plt.imshow(img)
+	return img
 
 def neigh(i,j):
     if i>=h or i<0 or j>=w or j<0:
@@ -139,7 +139,7 @@ def negsample(corner,pic_size=500,sam_size=50):
                 cand.append([i,j])
     return random.sample(cand,len(corner))
 
-def properties(header=[]):
+def properties(header=['ND面硬度(Hv)', 'TD面硬度(Hv)', 'UTS strain(%)', 'UTS stress(MPa)','Total Elongation(%)','Ys(Mpa)', 'C2', 'Si1', 'Mn3', 'P1','Cu5', 'Cr', 'Ti4', 'Al7']):
     df=pd.read_excel("data/properties.xlsx",sheet_name="summary")
     names=df["Title"].values
     data=df[header].values
@@ -148,6 +148,7 @@ def properties(header=[]):
         data[:,i]=(data[:,i]-np.mean(data[:,i]))/np.std(data[:,i])
     for i,name in enumerate(names):
         dic[str(name)]=data[i,:].tolist()
+    torch.save(dic,"data/properties.pkl")
     return dic
 def quaternion(angle):
     a,b,c=angle

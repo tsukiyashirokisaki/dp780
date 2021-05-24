@@ -40,7 +40,8 @@
 ├── prediction.ipynb
 └── edge.py
 ```
-
+## 0. Download Data Folder
+https://drive.google.com/drive/folders/1GDEooTAzIJFXFBoLTik--1UeqTq9tULY?usp=sharing
 ## 1. Add bounding boxes on deformed IPF
 ```
 python deform.py [data_path]
@@ -107,4 +108,10 @@ The output cluster.pkl and some figures will be dumped under data/1180/train/202
 
 ## 5. Phase Analysis and Crack Propagation
 see prediction.ipynb
+
+## Todo
+1. 不寫死crack size >200的門檻值，可以用裂紋大小賦予不同程度label的值，而不是有裂紋=1，沒有裂紋=0(從hard label改成soft label)
+3. 加上不同pixel產生裂紋的uncertainty
+4. 將變動的strain量做為模型的輸入
+5. 將train val test直接分開，而不是用日期來區分
 
